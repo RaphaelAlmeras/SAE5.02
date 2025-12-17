@@ -1,0 +1,12 @@
+- name: Déployer un service web via Ansible
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Lancer un conteneur web nginx
+      docker_container:
+        name: demo-web
+        image: nginx:alpine
+        state: started
+        published_ports:
+          - "8081:80"

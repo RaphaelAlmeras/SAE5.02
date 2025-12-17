@@ -1,0 +1,13 @@
+- name: Nettoyage Docker
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Supprimer le conteneur demo-web s'il existe
+      docker_container:
+        name: demo-web
+        state: absent
+
+    - name: Message de confirmation
+      debug:
+        msg: "Nettoyage Docker terminé"

@@ -1,0 +1,13 @@
+- name: Déployer un conteneur Nginx avec Ansible
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Lancer un conteneur Nginx
+      docker_container:
+        name: web-catalogue
+        image: nginx:alpine
+        state: started
+        restart_policy: always
+        published_ports:
+          - "8080:80"

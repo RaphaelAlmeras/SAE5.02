@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogue IT</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      text-align: center;
+    }
+    .catalogue-buttons {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+    .catalogue-button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .catalogue-button:hover {
+      background-color: #218838;
+    }
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Catalogue Informatique</h1>
+    <p>Explorez nos services et outils disponibles</p>
+  </header>
+
+  <div class="container">
+    <h2>Services disponibles</h2>
+    <p>Cliquez sur un bouton pour plus d'informations ou d'actions.</p>
+
+    <div class="catalogue-buttons">
+      <a href="/scripts/deploy_web.sh" target="_blank">
+        <button class="catalogue-button" id="deploy-web">Déployer un serveur web</button>
+      </a>
+      <a href="/scripts/create_user.sh" target="_blank">
+        <button class="catalogue-button" id="create-user">Créer un utilisateur Linux</button>
+      </a>
+      <a href="/scripts/system_update.sh" target="_blank">
+        <button class="catalogue-button" id="update-system">Mettre à jour le système</button>
+      </a>
+      <a href="/scripts/cleanup_docker.sh" target="_blank">
+        <button class="catalogue-button" id="docker-clean">Nettoyage Docker</button>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Catalogue IT - Tous droits réservés</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,8 @@
+- name: Création d'un utilisateur (simulation)
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Simuler la création d'un utilisateur
+      debug:
+        msg: "Utilisateur 'nouvel_employe' créé (simulation)"

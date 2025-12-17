@@ -1,0 +1,8 @@
+- name: Premier playbook Ansible
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Afficher un message
+      debug:
+        msg: "Ansible fonctionne dans Docker"

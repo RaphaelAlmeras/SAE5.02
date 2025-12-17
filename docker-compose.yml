@@ -1,0 +1,18 @@
+services:
+  ansible-runner:
+    build: ./ansible
+    container_name: ansible-runner
+    volumes:
+      - ./ansible:/ansible
+      - ./www:/www
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /ansible
+    tty: true
+
+  web:
+    image: nginx:alpine
+    container_name: web-catalogue
+    ports:
+      - "8080:80"
+    volumes:
+      - ./www:/usr/share/nginx/html:ro
