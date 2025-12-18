@@ -10,6 +10,7 @@ RUN apt update && apt install -y \
         ansible \
         docker \
         requests \
+	flask \
     && apt clean
 
 WORKDIR /ansible
