@@ -1,8 +1,20 @@
-- name: Mise à jour système (simulation)
-  hosts: local
-  gather_facts: false
-
+---
+- name: Mise à jour du système
+  hosts: localhost
+  become: true
   tasks:
-    - name: Simuler une mise à jour système
-      debug:
-        msg: "Mise à jour système effectuée (simulation)"
+
+    - name: Mettre à jour le cache APT
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Mettre à jour tous les paquets
+      apt:
+        upgrade: dist
+
+    - name: Supprimer les paquets inutiles
+      apt:
+        autoremove: yes
+        purge: yes
+

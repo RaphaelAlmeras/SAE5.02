@@ -1,4 +1,5 @@
 from flask import Flask
+import os
 import subprocess
 
 app = Flask(__name__)
@@ -23,12 +24,10 @@ def create_user():
 
 @app.route("/update-system")
 def update_system():
-    subprocess.run([
-        "ansible-playbook",
-        "-i", "/ansible/inventory/hosts.ini",
-        "/ansible/playbooks/system_update.yml"
-    ])
-    return "Système mis à jour (simulation)"
+    os.system(
+        "ansible-playbook -i /ansible/inventory/hosts.ini /ansible/playbooks/system_update.yml"
+    )
+    return "Mise à jour système lancée"
 
 @app.route("/cleanup-docker")
 def cleanup_docker():
@@ -37,7 +36,7 @@ def cleanup_docker():
         "-i", "/ansible/inventory/hosts.ini",
         "/ansible/playbooks/cleanup_docker.yml"
     ])
-    return "Docker nettoyé"
+    return "Nettoyage Docker terminé avec succès !"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

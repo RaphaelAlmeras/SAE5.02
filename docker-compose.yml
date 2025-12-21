@@ -16,6 +16,8 @@ services:
   web:
     image: nginx:alpine
     container_name: web-catalogue
+    labels:
+      - "project=catalogue-it"
     ports:
       - "8080:80"
     volumes:

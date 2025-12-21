@@ -1,13 +1,34 @@
-- name: Nettoyage Docker
-  hosts: local
+- name: Nettoyage Docker sécurisé
+  hosts: localhost
   gather_facts: false
 
   tasks:
-    - name: Supprimer le conteneur demo-web s'il existe
-      docker_container:
-        name: demo-web
-        state: absent
 
-    - name: Message de confirmation
+    - name: Supprimer tous les conteneurs sauf ceux du catalogue IT
+      shell: |
+        docker ps -a --format '{{ "{{.Names}}" }}' \
+        | grep -vE '^(web-catalogue|ansible-runner)$' \
+        | while read c; do
+            docker rm -f "$c";
+          done
+      ignore_errors: true
+
+    - name: Supprimer les images Docker inutilisées
+      shell: docker image prune -af
+
+    - name: Supprimer les volumes de test
+      shell: |
+        docker volume ls -q \
+        | grep -E '^test_' \
+        | while read v; do
+            docker volume rm "$v";
+          done
+      ignore_errors: true
+
+    - name: Supprimer les réseaux Docker inutilisés
+      shell: docker network prune -f
+
+    - name: Fin du nettoyage Docker
       debug:
-        msg: "Nettoyage Docker terminé"
+        msg: "Nettoyage Docker terminé (catalogue IT conservé)"
+
