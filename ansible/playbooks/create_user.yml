@@ -1,8 +1,20 @@
-- name: Création d'un utilisateur (simulation)
-  hosts: local
+---
+- name: Créer un utilisateur Linux
+  hosts: localhost
+  become: true
   gather_facts: false
 
   tasks:
-    - name: Simuler la création d'un utilisateur
-      debug:
-        msg: "Utilisateur 'nouvel_employe' créé (simulation)"
+    - name: Créer un utilisateur Linux
+      user:
+        name: "{{ username }}"
+        password: "{{ user_password | password_hash('sha512') }}"
+        shell: /bin/bash
+        state: present
+
+    - name: Ajouter l'utilisateur au groupe sudo
+      user:
+        name: "{{ username }}"
+        groups: sudo
+        append: yes
+

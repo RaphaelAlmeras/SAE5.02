@@ -2,16 +2,15 @@ services:
   ansible-runner:
     build: ./ansible
     container_name: ansible-runner
-    volumes:
-      - ./ansible:/ansible
-      - ./www:/www
-      - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /ansible
-    command: python /ansible/app.py
+    privileged: true
     ports:
       - "5000:5000"
+    volumes:
+      - /etc:/etc
+      - /home:/home
+      - /var/run/docker.sock:/var/run/docker.sock
     tty: true
-
 
   web:
     image: nginx:alpine
@@ -22,3 +21,4 @@ services:
       - "8080:80"
     volumes:
       - ./www:/usr/share/nginx/html:ro
+

@@ -1,21 +1,29 @@
 FROM python:3.11-slim
 
-RUN apt update && apt install -y \
-    ssh \
+# Dépendances système
+RUN apt-get update && apt-get install -y \
     sudo \
+    ssh \
     gcc \
     docker.io \
-    python3 \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/* \
     python3-dev \
     libffi-dev \
-    && pip install --no-cache-dir \
-        ansible \
-        docker \
-        requests \
-	flask \
-    && apt clean
+    && rm -rf /var/lib/apt/lists/*
+
+# Dépendances Python
+RUN pip install --no-cache-dir \
+    ansible \
+    docker \
+    requests \
+    flask \
+    passlib
+
+# Alias sécurité (si un module appelle "python")
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 WORKDIR /ansible
+
+COPY . /ansible
+
+CMD ["python3", "app.py"]
 
