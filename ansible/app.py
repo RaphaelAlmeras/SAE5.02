@@ -56,5 +56,29 @@ def cleanup_docker():
     ])
     return "Nettoyage Docker terminé avec succès !"
 
+@app.route("/system-status")
+def system_status():
+    os.system(
+        "ansible-playbook -i /ansible/inventory/hosts.ini "
+        "/ansible/playbooks/system_status.yml"
+    )
+    return "Vérification de l'état du système terminée"
+
+@app.route("/create-group")
+def create_group():
+    os.system(
+        "ansible-playbook -i /ansible/inventory/hosts.ini "
+        "/ansible/playbooks/create_group.yml"
+    )
+    return "Groupe Linux créé et utilisateurs ajoutés"
+
+@app.route("/install-software")
+def install_software():
+    os.system(
+        "ansible-playbook -i /ansible/inventory/hosts.ini "
+        "/ansible/playbooks/install_software.yml"
+    )
+    return "Installation du logiciel terminée"
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

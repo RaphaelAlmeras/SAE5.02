@@ -1,0 +1,9 @@
+---
+- name: Créer un groupe Linux
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Placeholder
+      debug:
+        msg: "Playbook create_group prêt"

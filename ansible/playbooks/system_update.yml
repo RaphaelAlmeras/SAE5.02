@@ -1,20 +1,28 @@
 ---
-- name: Mise à jour du système
+- name: Simulation de mise à jour système
   hosts: localhost
-  become: true
+  gather_facts: false
+
   tasks:
+    - name: Afficher le système ciblé
+      command: uname -a
+      register: sysinfo
 
-    - name: Mettre à jour le cache APT
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600
+    - name: Afficher la version de l'OS
+      command: cat /etc/os-release
+      register: osrelease
+      ignore_errors: true
 
-    - name: Mettre à jour tous les paquets
-      apt:
-        upgrade: dist
+    - name: Simuler une mise à jour APT
+      command: apt-get -s upgrade
+      register: upgrade_simulation
+      ignore_errors: true
 
-    - name: Supprimer les paquets inutiles
-      apt:
-        autoremove: yes
-        purge: yes
+    - name: Résumé
+      debug:
+        msg:
+          - "Système analysé"
+          - "{{ sysinfo.stdout | default('N/A') }}"
+          - "{{ osrelease.stdout | default('OS non détecté') }}"
+          - "Simulation APT exécutée (aucune modification réelle)"
 

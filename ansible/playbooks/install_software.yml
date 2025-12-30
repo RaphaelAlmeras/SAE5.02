@@ -1,0 +1,9 @@
+---
+- name: Installer un logiciel
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Placeholder
+      debug:
+        msg: "Playbook install_software prêt"

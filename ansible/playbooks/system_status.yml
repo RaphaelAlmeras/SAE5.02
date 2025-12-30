@@ -1,0 +1,9 @@
+---
+- name: Vérifier l'état du système
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Placeholder
+      debug:
+        msg: "Playbook system_status prêt"
