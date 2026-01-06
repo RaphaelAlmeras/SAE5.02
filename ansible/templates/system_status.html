@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>État du système</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 30px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: auto;
+    }
+    pre {
+      background: #eee;
+      padding: 10px;
+      overflow-x: auto;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>État du système</h1>
+
+  <p><strong>Nom de la machine :</strong> {{ hostname }}</p>
+  <p><strong>Uptime :</strong> {{ uptime }}</p>
+
+  <h3>CPU</h3>
+  <pre>{{ cpu }}</pre>
+
+  <h3>Mémoire</h3>
+  <pre>{{ memory }}</pre>
+
+  <h3>Disque</h3>
+  <pre>{{ disk }}</pre>
+
+  <a class="btn" href="http://localhost:8080/">⬅ Retour au catalogue</a>
+</div>
+
+</body>
+</html>

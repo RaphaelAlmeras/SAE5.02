@@ -1,9 +1,51 @@
 ---
-- name: Vérifier l'état du système
+- name: Vérification de l'état du système
   hosts: localhost
   gather_facts: false
 
   tasks:
-    - name: Placeholder
+
+    - name: Nom de la machine
+      command: hostname
+      register: hostname_out
+
+    - name: Uptime
+      command: uptime -p
+      register: uptime_out
+
+    - name: Utilisation CPU
+      shell: top -bn1 | grep "Cpu(s)"
+      register: cpu_usage
+
+    - name: Mémoire RAM
+      command: free -h
+      register: memory_out
+      changed_when: false
+
+    - name: Espace disque
+      command: df -h /
+      register: disk_out
+      changed_when: false
+
+    - name: Kernel
+      command: uname -r
+      register: kernel_out
+
+    - name: Affichage du rapport système
       debug:
-        msg: "Playbook system_status prêt"
+        msg: |
+          ===== ÉTAT DU SYSTÈME =====
+          Hostname : {{ hostname_out.stdout }}
+          Uptime   : {{ uptime_out.stdout }}
+
+          --- CPU ---
+          {{ cpu_usage.stdout }}
+
+          --- Mémoire ---
+          {{ memory_out.stdout }}
+
+          --- Disque ---
+          {{ disk_out.stdout }}
+
+          Kernel : {{ kernel_out.stdout }}
+

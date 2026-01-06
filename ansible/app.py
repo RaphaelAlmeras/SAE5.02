@@ -1,4 +1,5 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
+import socket
 import os
 import subprocess
 
@@ -7,7 +8,6 @@ app = Flask(__name__)
 @app.route("/create-user", methods=["GET", "POST"])
 def create_user():
 
-    # 1️⃣ Affichage du formulaire (GET)
     if request.method == "GET":
         return """
         <h2>Créer un utilisateur Linux</h2>
@@ -24,7 +24,6 @@ def create_user():
         <a href="http://localhost:8080/">Retour au catalogue</a>
         """
 
-    # 2️⃣ Création utilisateur (POST)
     username = request.form.get("username")
     password = request.form.get("password")
 
@@ -42,27 +41,41 @@ def create_user():
 
 @app.route("/update-system")
 def update_system():
+    # Lancer le playbook de mise à jour
     os.system(
         "ansible-playbook -i /ansible/inventory/hosts.ini /ansible/playbooks/system_update.yml"
     )
-    return "Mise à jour système lancée"
+    return render_template("system_update_status.html")
 
 @app.route("/cleanup-docker")
 def cleanup_docker():
-    subprocess.run([
-        "ansible-playbook",
-        "-i", "/ansible/inventory/hosts.ini",
-        "/ansible/playbooks/cleanup_docker.yml"
-    ])
-    return "Nettoyage Docker terminé avec succès !"
+    # Lancer le playbook de nettoyage Docker
+    os.system(
+        "ansible-playbook -i /ansible/inventory/hosts.ini /ansible/playbooks/cleaner_docker.yml"
+    )
+    return render_template("docker_clean_status.html")
 
 @app.route("/system-status")
 def system_status():
-    os.system(
-        "ansible-playbook -i /ansible/inventory/hosts.ini "
-        "/ansible/playbooks/system_status.yml"
+    subprocess.run(
+        "ansible-playbook -i /ansible/inventory/hosts.ini /ansible/playbooks/system_status.yml",
+        shell=True
     )
-    return "Vérification de l'état du système terminée"
+
+    hostname = socket.gethostname()
+    uptime = subprocess.getoutput("uptime -p")
+    cpu = subprocess.getoutput("top -bn1 | grep 'Cpu(s)'")
+    memory = subprocess.getoutput("free -h")
+    disk = subprocess.getoutput("df -h /")
+
+    return render_template(
+        "system_status.html",
+        hostname=hostname,
+        uptime=uptime,
+        cpu=cpu,
+        memory=memory,
+        disk=disk
+    )
 
 @app.route("/create-group")
 def create_group():
