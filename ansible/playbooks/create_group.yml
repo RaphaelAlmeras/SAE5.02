@@ -1,9 +1,21 @@
 ---
-- name: Créer un groupe Linux
+- name: Créer un groupe Linux et ajouter des utilisateurs
   hosts: localhost
   gather_facts: false
 
+  vars:
+    group_name: "{{ group_name }}"
+    users_to_add: "{{ users_to_add | from_json }}"
+
   tasks:
-    - name: Placeholder
-      debug:
-        msg: "Playbook create_group prêt"
+    - name: Créer le groupe Linux
+      group:
+        name: "{{ group_name }}"
+        state: present
+
+    - name: Ajouter les utilisateurs au groupe
+      user:
+        name: "{{ item }}"
+        group: "{{ group_name }}"
+        append: yes
+      loop: "{{ users_to_add }}"

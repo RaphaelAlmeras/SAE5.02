@@ -2,6 +2,7 @@ from flask import Flask, request, render_template
 import socket
 import os
 import subprocess
+import json
 
 app = Flask(__name__)
 
@@ -77,13 +78,35 @@ def system_status():
         disk=disk
     )
 
-@app.route("/create-group")
+@app.route("/create-group", methods=["GET", "POST"])
 def create_group():
-    os.system(
-        "ansible-playbook -i /ansible/inventory/hosts.ini "
-        "/ansible/playbooks/create_group.yml"
-    )
-    return "Groupe Linux créé et utilisateurs ajoutés"
+    if request.method == "POST":
+        group_name = request.form["group_name"]
+
+        # Nettoyage + conversion en vraie liste
+        users = [
+            u.strip()
+            for u in request.form["users"].split(",")
+            if u.strip()
+        ]
+
+        users_json = json.dumps(users)  # On envoie la liste en JSON
+
+        os.system(
+            f"ansible-playbook "
+            f"-i /ansible/inventory/hosts.ini "
+            f"/ansible/playbooks/create_group.yml "
+            f"-e 'group_name={group_name}' "
+            f"-e 'users_to_add={users_json}'"
+        )
+
+        return render_template(
+            "create_group_status.html",
+            group_name=group_name,
+            users=users
+        )
+
+    return render_template("create_group_form.html")
 
 @app.route("/install-software")
 def install_software():
