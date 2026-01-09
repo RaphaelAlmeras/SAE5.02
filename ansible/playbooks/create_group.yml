@@ -3,10 +3,6 @@
   hosts: localhost
   gather_facts: false
 
-  vars:
-    group_name: "{{ group_name }}"
-    users_to_add: "{{ users_to_add | from_json }}"
-
   tasks:
     - name: Créer le groupe Linux
       group:
@@ -16,6 +12,7 @@
     - name: Ajouter les utilisateurs au groupe
       user:
         name: "{{ item }}"
-        group: "{{ group_name }}"
+        groups: "{{ group_name }}"
         append: yes
-      loop: "{{ users_to_add }}"
+      # On force la conversion de la chaîne JSON en liste ici :
+      loop: "{{ users_to_add | from_json }}"

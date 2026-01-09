@@ -52,7 +52,7 @@ def update_system():
 def cleanup_docker():
     # Lancer le playbook de nettoyage Docker
     os.system(
-        "ansible-playbook -i /ansible/inventory/hosts.ini /ansible/playbooks/cleaner_docker.yml"
+        "ansible-playbook -i /ansible/inventory/hosts.ini /ansible/playbooks/cleanup_docker.yml"
     )
     return render_template("docker_clean_status.html")
 
@@ -83,22 +83,26 @@ def create_group():
     if request.method == "POST":
         group_name = request.form["group_name"]
 
-        # Nettoyage + conversion en vraie liste
-        users = [
-            u.strip()
-            for u in request.form["users"].split(",")
-            if u.strip()
+        # 1. On nettoie et on crée la liste Python
+        users = [user.strip() for user in request.form["users"].split(",") if user.strip()]
+
+        # 2. On transforme la liste en chaîne JSON pour qu'Ansible la comprenne
+        users_json = json.dumps(users)
+
+        # 3. On prépare la commande (version sécurisée avec subprocess)
+        command = [
+            "ansible-playbook",
+            "-i", "/ansible/inventory/hosts.ini",
+            "/ansible/playbooks/create_group.yml",
+            "-e", f"group_name={group_name}",
+            "-e", f"users_to_add={users_json}"
         ]
 
-        users_json = json.dumps(users)  # On envoie la liste en JSON
-
-        os.system(
-            f"ansible-playbook "
-            f"-i /ansible/inventory/hosts.ini "
-            f"/ansible/playbooks/create_group.yml "
-            f"-e 'group_name={group_name}' "
-            f"-e 'users_to_add={users_json}'"
-        )
+        # 4. On exécute la commande
+        try:
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Erreur lors de l'exécution du playbook : {e}")
 
         return render_template(
             "create_group_status.html",
@@ -108,13 +112,23 @@ def create_group():
 
     return render_template("create_group_form.html")
 
-@app.route("/install-software")
+@app.route("/install-software", methods=["GET", "POST"])
 def install_software():
-    os.system(
-        "ansible-playbook -i /ansible/inventory/hosts.ini "
-        "/ansible/playbooks/install_software.yml"
-    )
-    return "Installation du logiciel terminée"
+    if request.method == "POST":
+        # Récupérer le nom du logiciel depuis le bouton
+        software_name = request.form["software_name"]
+
+        # Lancer le playbook Ansible pour installer le logiciel
+        os.system(
+            f"ansible-playbook "
+            f"-i /ansible/inventory/hosts.ini "
+            f"/ansible/playbooks/install_software.yml "
+            f"-e 'software_name={software_name}'"
+        )
+
+        return render_template("install_software_status.html", software_name=software_name)
+
+    return render_template("install_software_form.html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
