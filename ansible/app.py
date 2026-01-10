@@ -83,31 +83,35 @@ def create_group():
     if request.method == "POST":
         group_name = request.form["group_name"]
 
-        # 1. On nettoie et on crée la liste Python
-        users = [user.strip() for user in request.form["users"].split(",") if user.strip()]
+        # 1. On récupère la chaîne brute (ex: "user1, user2")
+        # On peut la nettoyer un peu ici pour l'affichage,
+        # mais on l'envoie telle quelle à Ansible
+        raw_users = request.form["users"]
 
-        # 2. On transforme la liste en chaîne JSON pour qu'Ansible la comprenne
-        users_json = json.dumps(users)
+        # On prépare la liste pour l'affichage final dans le template HTML
+        users_list = [u.strip() for u in raw_users.split(",") if u.strip()]
 
-        # 3. On prépare la commande (version sécurisée avec subprocess)
+        # 2. On prépare la commande
+        # On envoie 'raw_users' directement. Ansible fera le split lui-même.
         command = [
             "ansible-playbook",
             "-i", "/ansible/inventory/hosts.ini",
             "/ansible/playbooks/create_group.yml",
             "-e", f"group_name={group_name}",
-            "-e", f"users_to_add={users_json}"
+            "-e", f"users_to_add={raw_users}"
         ]
 
-        # 4. On exécute la commande
+        # 3. On exécute la commande
         try:
             subprocess.run(command, check=True)
         except subprocess.CalledProcessError as e:
             print(f"Erreur lors de l'exécution du playbook : {e}")
+            # Optionnel : tu pourrais rediriger vers une page d'erreur ici
 
         return render_template(
             "create_group_status.html",
             group_name=group_name,
-            users=users
+            users=users_list
         )
 
     return render_template("create_group_form.html")
@@ -115,19 +119,31 @@ def create_group():
 @app.route("/install-software", methods=["GET", "POST"])
 def install_software():
     if request.method == "POST":
-        # Récupérer le nom du logiciel depuis le bouton
-        software_name = request.form["software_name"]
+        # Récupérer le nom du logiciel depuis le formulaire
+        software_name = request.form.get("software_name")
 
-        # Lancer le playbook Ansible pour installer le logiciel
-        os.system(
-            f"ansible-playbook "
-            f"-i /ansible/inventory/hosts.ini "
-            f"/ansible/playbooks/install_software.yml "
-            f"-e 'software_name={software_name}'"
-        )
+        if not software_name:
+            return "Erreur : Aucun logiciel sélectionné", 400
+
+        # Commande sécurisée
+        command = [
+            "ansible-playbook",
+            "-i", "/ansible/inventory/hosts.ini",
+            "/ansible/playbooks/install_software.yml",
+            "-e", f"software_name={software_name}"
+        ]
+
+        try:
+            # On lance le playbook
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Erreur lors de l'exécution d'Ansible : {e}")
+            # On continue pour afficher la page de statut même en cas d'erreur
+            # ou tu peux renvoyer vers une page d'erreur spécifique
 
         return render_template("install_software_status.html", software_name=software_name)
 
+    # Si c'est un GET, on affiche le formulaire de sélection
     return render_template("install_software_form.html")
 
 if __name__ == "__main__":

@@ -11,8 +11,9 @@
 
     - name: Ajouter les utilisateurs au groupe
       user:
-        name: "{{ item }}"
+        name: "{{ item | trim }}"
         groups: "{{ group_name }}"
         append: yes
-      # On force la conversion de la chaîne JSON en liste ici :
-      loop: "{{ users_to_add | from_json }}"
+      # On découpe la chaîne par les virgules et on boucle sur le résultat
+      loop: "{{ users_to_add.split(',') }}"
+      when: users_to_add | length > 0
