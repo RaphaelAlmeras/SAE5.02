@@ -10,6 +10,7 @@ services:
       - /etc:/etc
       - /home:/home
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./backups:/ansible/backups
     tty: true
 
   web:

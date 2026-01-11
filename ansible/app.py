@@ -172,5 +172,34 @@ def security_audit():
         print(f"Erreur audit: {e.output}")
         return "Erreur lors de l'audit", 500
 
+@app.route("/backup-system")
+def backup_system():
+    command = [
+        "ansible-playbook",
+        "-i", "/ansible/inventory/hosts.ini",
+        "/ansible/playbooks/system_backup.yml"
+    ]
+
+    try:
+        # On exécute et on récupère la sortie
+        process = subprocess.run(command, capture_output=True, text=True, check=True)
+
+        # ON FORCE L'AFFICHAGE DANS LES LOGS DOCKER
+        print("--- SORTIE ANSIBLE BACKUP ---")
+        print(process.stdout)
+        print("-----------------------------")
+
+        backup_details = "Inconnu"
+        for line in process.stdout.split('\n'):
+            if "BACKUP_INFO:" in line:
+                # On nettoie la chaîne pour enlever les résidus de debug Ansible
+                backup_details = line.split("BACKUP_INFO:")[1].strip(' "],')
+
+        return render_template("backup_status.html", details=backup_details)
+
+    except subprocess.CalledProcessError as e:
+        print(f"ERREUR LORS DU BACKUP :\n{e.stdout}\n{e.stderr}")
+        return "Erreur lors de la sauvegarde (voir logs docker)", 500
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

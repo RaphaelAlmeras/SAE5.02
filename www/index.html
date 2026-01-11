@@ -3,94 +3,147 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catalogue IT</title>
+  <title>Catalogue IT | Dashboard</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      color: #333;
-      margin: 0;
-      padding: 0;
+    :root {
+      --primary: #2c3e50;
+      --secondary: #34495e;
+      --success: #27ae60;
+      --info: #3498db;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --light: #ecf0f1;
     }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      color: var(--primary);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
     header {
-      background-color: #007bff;
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .container {
+      flex: 1; /* Pousse le footer vers le bas */
+      width: 90%;
+      max-width: 1200px;
+      margin: 40px auto;
+      text-align: center;
+    }
+
+    h2 { margin-bottom: 30px; font-weight: 300; font-size: 2rem; }
+
+    /* Grille de boutons */
+    .catalogue-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .catalogue-grid a {
+      text-decoration: none;
+    }
+
+    .catalogue-button {
+      width: 100%;
+      height: 120px; /* Hauteur fixe pour l'alignement */
+      background-color: white;
+      color: var(--primary);
+      border: 2px solid transparent;
+      padding: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .catalogue-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+      border-color: var(--info);
+      background-color: #fafafa;
+    }
+
+    /* Couleurs par fonction */
+    .btn-user { border-bottom: 5px solid var(--info); }
+    .btn-system { border-bottom: 5px solid var(--warning); }
+    .btn-docker { border-bottom: 5px solid var(--success); }
+    .btn-security { border-bottom: 5px solid var(--danger); }
+
+    .icon { font-size: 24px; margin-bottom: 10px; }
+
+    footer {
+      background-color: var(--primary);
       color: white;
       text-align: center;
       padding: 20px 0;
-    }
-    .container {
-      width: 80%;
-      margin: 20px auto;
-      text-align: center;
-    }
-    .catalogue-buttons {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin-top: 30px;
-    }
-    .catalogue-button {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      font-size: 16px;
-      margin: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .catalogue-button:hover {
-      background-color: #218838;
-    }
-    footer {
-      background-color: #333;
-      color: white;
-      text-align: center;
-      padding: 10px 0;
-      position: fixed;
-      bottom: 0;
       width: 100%;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Catalogue Informatique</h1>
-    <p>Explorez nos services et outils disponibles</p>
+    <h1>🛠️ Catalogue Informatique Automatisé</h1>
+    <p>Infrastructure as Code | Docker & Ansible</p>
   </header>
 
   <div class="container">
     <h2>Services disponibles</h2>
-    <p>Cliquez sur un bouton pour l'actionner.</p>
+    
+    <div class="catalogue-grid">
+      <a href="/create-user">
+        <button class="catalogue-button btn-user"><span class="icon">👤</span>Créer un utilisateur Linux</button>
+      </a>
+      
+      <a href="/create-group">
+        <button class="catalogue-button btn-user"><span class="icon">👥</span>Créer un groupe Linux</button>
+      </a>
 
-    <div class="catalogue-buttons">
-      <a href="http://localhost:5000/create-user">
-        <button class="catalogue-button">Créer un utilisateur Linux</button>
+      <a href="/update-system">
+        <button class="catalogue-button btn-system"><span class="icon">🔄</span>Mettre à jour le système</button>
       </a>
-      <a href="http://localhost:5000/update-system">
-        <button class="catalogue-button">Mettre à jour le système</button>
+
+      <a href="/system-status">
+        <button class="catalogue-button btn-system"><span class="icon">📊</span>Vérifier l'état du système</button>
       </a>
-      <a href="http://localhost:5000/cleanup-docker">
-        <button class="catalogue-button">Nettoyage Docker</button>
+
+      <a href="/cleanup-docker">
+        <button class="catalogue-button btn-docker"><span class="icon">🧹</span>Nettoyage Docker</button>
       </a>
-      <a href="http://localhost:5000/system-status">
-        <button class="catalogue-button">Vérifier l'état du système</button>
+
+      <a href="/install-software">
+        <button class="catalogue-button btn-docker"><span class="icon">📦</span>Installer un logiciel</button>
       </a>
-      <a href="http://localhost:5000/create-group">
-        <button class="catalogue-button">Créer un groupe Linux</button>
+
+      <a href="/security-audit">
+        <button class="catalogue-button btn-security"><span class="icon">🛡️</span>Audit de sécurité</button>
       </a>
-      <a href="http://localhost:5000/install-software">
-        <button class="catalogue-button">Installer un logiciel</button>
-      </a>
-      <a href="http://localhost:5000/security-audit">
-	<button class="catalogue-button">Procéder à un audit de sécurité</button>
+
+      <a href="/backup-system">
+        <button class="catalogue-button btn-system"><span class="icon">💾</span>Sauvegarde système</button>
       </a>
     </div>
-
+  </div>
 
   <footer>
-    <p>&copy; 2026 Catalogue IT - Tous droits réservés</p>
+    <p>&copy; 2026 Catalogue IT - Plateforme d'Automatisation Docker & Ansible</p>
   </footer>
 </body>
 </html>

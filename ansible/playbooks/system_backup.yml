@@ -1,0 +1,31 @@
+---
+- name: Sauvegarde du système et du catalogue
+  hosts: localhost
+  gather_facts: yes
+
+  vars:
+    source_dir: "/ansible"  # Le dossier que tu veux sauvegarder
+    backup_dest: "/ansible/backups"
+    date: "{{ ansible_date_time.date }}"
+
+  tasks:
+    - name: Créer le dossier de backup s'il n'existe pas
+      file:
+        path: "{{ backup_dest }}"
+        state: directory
+        mode: '0755'
+
+    - name: Créer l'archive compressée (.tar.gz)
+      archive:
+        path: "{{ source_dir }}"
+        dest: "{{ backup_dest }}/backup_catalogue_{{ date }}.tar.gz"
+        format: gz
+
+    - name: Récupérer les informations sur le fichier
+      stat:
+        path: "{{ backup_dest }}/backup_catalogue_{{ date }}.tar.gz"
+      register: backup_file
+
+    - name: Afficher les infos pour Flask
+      debug:
+        msg: "BACKUP_INFO:{{ backup_file.stat.path }} ({{ (backup_file.stat.size / 1024 / 1024) | round(2) }} MB)"
