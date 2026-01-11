@@ -35,7 +35,19 @@
 
   <p><strong>Le logiciel {{ software_name }} a été installé avec succès.</strong></p>
 
-  <a class="btn" href="http://localhost:8080/">⬅ Retour au catalogue</a>
+  <a class="btn" href="http://localhost:8080/">⬅ Retour au catalogue</a><br>
+
+
+  <div class="alert alert-success">
+      Le logiciel <strong>{{ software_name }}</strong> a été déployé avec succès !
+  </div>
+
+  <p>Vous pouvez y accéder ici : 
+     <a href="http://{{ ip_vm }}:8081" target="_blank">Accéder au service</a>
+  </p>
+
+  <p><em>Note : Si c'est un outil CLI, utilisez la commande : <code>docker exec -it {{ software_name }}-container [commande]</code></em></p>
+
 </div>
 
 </body>

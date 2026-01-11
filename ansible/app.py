@@ -8,37 +8,28 @@ app = Flask(__name__)
 
 @app.route("/create-user", methods=["GET", "POST"])
 def create_user():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-    if request.method == "GET":
-        return """
-        <h2>Créer un utilisateur Linux</h2>
-        <form method="post">
-            <label>Nom d'utilisateur :</label><br>
-            <input type="text" name="username" required><br><br>
+        # Commande sécurisée avec subprocess
+        command = [
+            "ansible-playbook",
+            "-i", "/ansible/inventory/hosts.ini",
+            "/ansible/playbooks/create_user.yml",
+            "-e", f"username={username} user_password={password}"
+        ]
 
-            <label>Mot de passe :</label><br>
-            <input type="password" name="password" required><br><br>
+        try:
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Erreur lors de la création de l'utilisateur : {e}")
 
-            <button type="submit">Créer l'utilisateur</button>
-        </form>
-        <br>
-        <a href="http://localhost:8080/">Retour au catalogue</a>
-        """
+        # On renvoie vers le template de succès
+        return render_template("create_user_status.html", username=username)
 
-    username = request.form.get("username")
-    password = request.form.get("password")
-
-    os.system(
-        f"ansible-playbook -i /ansible/inventory/hosts.ini "
-        f"/ansible/playbooks/create_user.yml "
-        f"-e \"username={username} user_password={password}\""
-    )
-
-    return f"""
-    <h2>Utilisateur créé</h2>
-    <p>L'utilisateur <b>{username}</b> a été créé.</p>
-    <a href="http://localhost:8080/">Retour au catalogue</a>
-    """
+    # Si c'est un GET, on affiche le formulaire
+    return render_template("create_user_form.html")
 
 @app.route("/update-system")
 def update_system():
@@ -145,6 +136,41 @@ def install_software():
 
     # Si c'est un GET, on affiche le formulaire de sélection
     return render_template("install_software_form.html")
+
+@app.route("/security-audit")
+def security_audit():
+    command = [
+        "ansible-playbook",
+        "-i", "/ansible/inventory/hosts.ini",
+        "/ansible/playbooks/security_audit.yml"
+    ]
+
+    try:
+        # On exécute et on capture la sortie texte
+        result = subprocess.check_output(command, stderr=subprocess.STDOUT, text=True)
+
+        # Petit dictionnaire pour stocker nos résultats extraits du log Ansible
+        audit_results = {
+            "sudo_users": "Inconnu",
+            "open_ports": "Inconnu",
+            "ufw_status": "Inconnu",
+            "updates": "0",
+            "failed_logins": "0"
+        }
+
+        # On parcourt les lignes pour trouver nos marqueurs
+        for line in result.split('\n'):
+            if "SUDO_USERS:" in line: audit_results["sudo_users"] = line.split("SUDO_USERS:")[1].strip(' "],')
+            if "OPEN_PORTS:" in line: audit_results["open_ports"] = line.split("OPEN_PORTS:")[1].strip(' "],')
+            if "UFW_STATUS:" in line: audit_results["ufw_status"] = line.split("UFW_STATUS:")[1].strip(' "],')
+            if "UPDATES:" in line: audit_results["updates"] = line.split("UPDATES:")[1].strip(' "],')
+            if "FAILED_LOGINS:" in line: audit_results["failed_logins"] = line.split("FAILED_LOGINS:")[1].strip(' "],')
+
+        return render_template("security_audit_results.html", audit=audit_results)
+
+    except subprocess.CalledProcessError as e:
+        print(f"Erreur audit: {e.output}")
+        return "Erreur lors de l'audit", 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

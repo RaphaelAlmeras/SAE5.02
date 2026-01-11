@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport d'Audit Sécurité</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 40px; }
+        
+	.container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+	.metric { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #fafafa; }
+        .label { font-weight: bold; color: #34495e; }
+        .value { color: #16a085; }
+        
+	.status-warn { color: #e67e22; font-weight: bold; }
+        .status-danger { color: #e74c3c; font-weight: bold; }
+        
+	.btn-back { display: inline-block; margin-top: 30px; padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Rapport d'Audit Sécurité</h1>
+        
+        <div class="metric">
+            <span class="label">Utilisateurs avec droits SUDO :</span>
+            <span class="value">{{ audit.sudo_users }}</span>
+        </div>
+
+        <div class="metric">
+            <span class="label">Ports ouverts détectés :</span>
+            <span class="value">{{ audit.open_ports }}</span>
+        </div>
+
+        <div class="metric">
+            <span class="label">État du Pare-feu (UFW) :</span>
+            <span class="{% if 'active' not in audit.ufw_status.lower() %}status-danger{% else %}value{% endif %}">
+                {{ audit.ufw_status }}
+            </span>
+        </div>
+
+        <div class="metric">
+            <span class="label">Mises à jour système en attente :</span>
+            <span class="{% if audit.updates|int > 0 %}status-warn{% else %}value{% endif %}">
+                {{ audit.updates }} paquet(s)
+            </span>
+        </div>
+
+        <div class="metric">
+            <span class="label">Tentatives SSH échouées (récentes) :</span>
+            <span class="{% if audit.failed_logins|int > 0 %}status-warn{% else %}value{% endif %}">
+                {{ audit.failed_logins }}
+            </span>
+        </div>
+
+        <a href="http://localhost:8080/" class="btn-back">Retour au Catalogue</a>
+    </div>
+</body>
+</html>

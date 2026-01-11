@@ -1,0 +1,36 @@
+---
+- name: Audit de sécurité système
+  hosts: localhost
+  gather_facts: yes
+
+  tasks:
+    - name: 1. Vérifier les utilisateurs avec droits SUDO
+      shell: "grep '^sudo' /etc/group | cut -d: -f4"
+      register: sudo_users
+
+    - name: 2. Lister les ports en écoute (TCP/UDP)
+      shell: "ss -tuln | grep LISTEN | awk '{print $5}' | cut -d: -f2 | sort -u | xargs"
+      register: open_ports
+
+    - name: 3. Vérifier si le pare-feu (UFW) est actif
+      shell: "ufw status | grep Status || echo 'Status: Not Installed'"
+      register: ufw_status
+      ignore_errors: yes
+
+    - name: 4. Compter les paquets à mettre à jour
+      shell: "apt list --upgradable 2>/dev/null | grep -v 'Listing' | wc -l"
+      register: updates_count
+
+    - name: 5. Vérifier les tentatives de connexion échouées (SSH)
+      shell: "lastb | head -n 5 | wc -l"
+      register: failed_logins
+
+    # On utilise debug pour que Flask puisse capturer ces infos dans stdout
+    - name: Rapport final
+      debug:
+        msg:
+          - "SUDO_USERS:{{ sudo_users.stdout }}"
+          - "OPEN_PORTS:{{ open_ports.stdout }}"
+          - "UFW_STATUS:{{ ufw_status.stdout }}"
+          - "UPDATES:{{ updates_count.stdout }}"
+          - "FAILED_LOGINS:{{ failed_logins.stdout }}"
